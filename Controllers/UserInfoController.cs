@@ -19,6 +19,7 @@ namespace JwtApplication.Controllers
             _unitOfWork = unitOfWork;
         }
 
+        #region CRUD
         // GET: api/UserInfo
         [HttpGet, Route("[controller]")]
         public async Task<ActionResult<IEnumerable<UserInfo>>> GetUserInfos()
@@ -40,24 +41,6 @@ namespace JwtApplication.Controllers
 
             return userInfo;
         }
-        // GET: api/UserInfo/5/roles
-        [HttpGet("[controller]/{id}/roles")]
-        public async Task<ActionResult<IEnumerable<Role>>> GetUserRoles(int id)
-        {
-            var userInfo = await _unitOfWork.UserInfoRepo.FindById(id);
-
-            if (userInfo == null)
-            {
-                return NotFound("id: " + id + " Not found.");
-            }
-            List<Role> result = new List<Role>();
-            foreach (UserRole ur in userInfo.UserRoles)
-            {
-                result.Add(ur.Role);
-            }
-            return Ok(result);
-        }
-
 
         // PUT: api/UserInfo/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -90,9 +73,8 @@ namespace JwtApplication.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 throw;
+                return NoContent();
             }
-
-            return NoContent();
         }
 
         // POST: api/UserInfo
@@ -126,33 +108,7 @@ namespace JwtApplication.Controllers
                 id = userInfo.UserId
             }, userInfo);
         }
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpGet, Route("[controller]/{id}/roles/{roleId}")]
-        public async Task<ActionResult<UserInfo>> PostUserRole(int id, int roleId)
-        {
-            var userToUpdate = await _unitOfWork.UserInfoRepo.FindById(id);
-            if (userToUpdate == null)
-            {
-                return NotFound("User not found!");
-            }
-            var role = await _unitOfWork.RoleRepo.FindById(roleId);
-            if (role == null)
-            {
-                return NotFound("Role not found!");
-            }
-            //foreach (UserRole uRole in userToUpdate.UserRoles)
-            //{
-            //    if (uRole.RoleId == roleId)
-            //    {
-            //        return Content("Role has already added");
-            //    }
-            //}
-            role.UserRoles = new List<UserRole>();
-            role.UserRoles.Add(new UserRole() { Role = role, RoleId = role.Id, UserId = userToUpdate.UserId, UserInfo = userToUpdate });
-            await _unitOfWork.RoleRepo.Update(role);
-            await _unitOfWork.CommitAsync();
-            return Ok("Role added");
-        }
+
         // DELETE: api/UserInfo/5
         [HttpDelete("[controller]/{id}")]
         public async Task<IActionResult> DeleteUserInfo(int id)
@@ -168,12 +124,86 @@ namespace JwtApplication.Controllers
 
             return Content("Deleted");
         }
+        #endregion
 
         private bool UserInfoExists(int id)
         {
             return _unitOfWork.UserInfoRepo.IsExists(id).Result;
         }
 
+        #region roles
+        // GET: api/UserInfo/5/roles
+        [HttpGet("[controller]/{id}/roles")]
+        public async Task<ActionResult<IEnumerable<Role>>> GetUserRoles(int id)
+        {
+            var userInfo = await _unitOfWork.UserInfoRepo.FindById(id);
+
+            if (userInfo == null)
+            {
+                return NotFound("id: " + id + " Not found.");
+            }
+            List<Role> result = new List<Role>();
+            foreach (UserRole ur in userInfo.UserRoles)
+            {
+                result.Add(ur.Role);
+            }
+            return Ok(result);
+        }
+
+        [HttpPost, Route("[controller]/{id}/roles/{roleId}")]
+        public async Task<ActionResult<IEnumerable<UserRole>>> PostUserRole(int id, int roleId)
+        {
+            var userToUpdate = await _unitOfWork.UserInfoRepo.FindById(id);
+            if (userToUpdate == null)
+            {
+                return NotFound("User not found!");
+            }
+            var role = await _unitOfWork.RoleRepo.FindById(roleId);
+            if (role == null)
+            {
+                return NotFound("Role not found!");
+            }
+            foreach (UserRole uRole in userToUpdate.UserRoles)
+            {
+                if (uRole.RoleId == roleId)
+                {
+                    return Content("Role has already added");
+                }
+            }
+            userToUpdate.UserRoles.Add(new UserRole() { Role = role, RoleId = role.Id, UserId = userToUpdate.UserId, UserInfo = userToUpdate });
+            await _unitOfWork.UserInfoRepo.Update(userToUpdate);
+            await _unitOfWork.CommitAsync();
+
+
+            return Ok(userToUpdate.UserRoles);
+        }
+
+        [HttpDelete, Route("[controller]/{id}/roles/{roleId}")]
+        public async Task<ActionResult<IEnumerable<UserRole>>> DeleteUserRole(int id, int roleId)
+        {
+            var userToUpdate = await _unitOfWork.UserInfoRepo.FindById(id);
+            if (userToUpdate == null)
+            {
+                return NotFound("User not found!");
+            }
+            var role = await _unitOfWork.RoleRepo.FindById(roleId);
+            if (role == null)
+            {
+                return NotFound("Role not found!");
+            }
+            foreach (UserRole uRole in userToUpdate.UserRoles)
+            {
+                if (uRole.RoleId == roleId)
+                {
+                    userToUpdate.UserRoles.Remove(uRole);
+                    await _unitOfWork.UserInfoRepo.Update(userToUpdate);
+                    await _unitOfWork.CommitAsync();
+                    return Ok(userToUpdate.UserRoles);
+                }
+            }
+            return NotFound();
+        }
+        #endregion
 
 
         [AllowAnonymous]
