@@ -23,8 +23,7 @@ namespace JwtApplication.Data
                 entity.Property(e => e.RefreshToken);
                 entity.Property(e => e.CreatedTime);
                 entity.Property(e => e.ExpiredTime);
-
-
+                entity.Property(e => e.Revoked);
             });
             modelBuilder.Entity<UserInfo>(entity =>
             {
@@ -35,9 +34,7 @@ namespace JwtApplication.Data
                 entity.Property(e => e.Email).HasMaxLength(100);
                 entity.Property(e => e.Password).HasMaxLength(100).IsUnicode(false);
                 entity.Property(e => e.CreatedDate);
-
-            }
-            );
+            });
 
             modelBuilder.Entity<Role>(entity =>
             {

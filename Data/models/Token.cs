@@ -12,7 +12,10 @@ namespace JwtApplication.Data.models
         public string RefreshToken { get; set; }
         public DateTime CreatedTime { get; set; }
         public DateTime ExpiredTime { get; set; }
-        public bool IsExpired => DateTime.UtcNow >= ExpiredTime;
+        public DateTime? Revoked { get; set; }
+        public bool IsRevoked => Revoked != null;
+        public bool IsExpired => DateTime.Now >= ExpiredTime;
+        public bool IsActive => !IsExpired && !IsRevoked;
 
 
 

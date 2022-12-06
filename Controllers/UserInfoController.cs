@@ -208,26 +208,29 @@ namespace JwtApplication.Controllers
 
         [AllowAnonymous]
         [HttpPost, Route("login")]
-        public ActionResult<AuthResponse> LoginAuthenticate([FromBody] LoginRequest request)
+        public async Task<IActionResult> Authenticate([FromBody] LoginRequest request)
         {
             if (request == null)
             {
                 return BadRequest("Invalid request! Username and password not null!");
             }
-
-            var user = _unitOfWork.UserInfoRepo.GetLoginUser(request);
-            if (user == null)
+            try
             {
-                return Content("incorrect username or password");
+                var response = _unitOfWork.UserInfoRepo.Authenticate(request);
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = DateTime.UtcNow.AddDays(7)
+                };
+                Response.Cookies.Append("Bearer", response.RefreshToken, cookieOptions);
+                return Ok(response);
             }
-            string accessToken = _unitOfWork.TokenRepo.GenerateAccessToken(user);
-            string refreshToken = _unitOfWork.TokenRepo.GenerateRefreshToken();
-
-            return Ok(new AuthResponse
+            catch (Exception)
             {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            });
+
+                throw;
+                return BadRequest();
+            }
         }
 
     }

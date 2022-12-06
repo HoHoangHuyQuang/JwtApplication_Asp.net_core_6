@@ -34,7 +34,7 @@ namespace JwtApplication.Repository.Implement
 
         public virtual async Task<IEnumerable<T>> FindAll()
         {
-            return await _dbSet.ToListAsync();
+            return await _dbSet.AsNoTracking().ToListAsync();
         }
 
         public virtual async Task<T> FindById(ID entityId)
@@ -59,7 +59,6 @@ namespace JwtApplication.Repository.Implement
 
             try
             {
-
                 _context.Entry(entity).State = EntityState.Modified;
                 return Task.FromResult(true);
             }

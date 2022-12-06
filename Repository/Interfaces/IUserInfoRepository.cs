@@ -5,7 +5,7 @@ namespace JwtApplication.Repository.Interfaces
 {
     public interface IUserInfoRepository : IBaseRepository<UserInfo, int>
     {
-        public UserInfo? GetLoginUser(LoginRequest request);
+        AuthResponse Authenticate(LoginRequest request);
         public bool IsExistByUsername(string username);
 
     }

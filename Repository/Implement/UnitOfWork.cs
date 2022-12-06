@@ -1,5 +1,6 @@
 ﻿using JwtApplication.Data;
 using JwtApplication.Repository.Interfaces;
+using JwtApplication.Security.Utils;
 
 namespace JwtApplication.Repository.Implement
 {
@@ -50,12 +51,13 @@ namespace JwtApplication.Repository.Implement
             {
                 if (this._token == null)
                 {
-                    this._token = new TokenRepository(_iconfig, _context);
+                    this._token = new TokenRepository(_context);
                 }
                 return _token;
             }
         }
 
+        public IJwtUtils JwtUtils => throw new NotImplementedException();
 
         public async Task CommitAsync()
         {
