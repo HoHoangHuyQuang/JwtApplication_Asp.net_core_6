@@ -1,6 +1,5 @@
 ﻿using JwtApplication.Data;
 using JwtApplication.Repository.Interfaces;
-using JwtApplication.Security.Utils;
 
 namespace JwtApplication.Repository.Implement
 {
@@ -57,7 +56,7 @@ namespace JwtApplication.Repository.Implement
             }
         }
 
-        public IJwtUtils JwtUtils => throw new NotImplementedException();
+
 
         public async Task CommitAsync()
         {

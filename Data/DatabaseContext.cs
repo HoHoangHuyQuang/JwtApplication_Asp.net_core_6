@@ -8,19 +8,18 @@ namespace JwtApplication.Data
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<UserInfo> UserInfos { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
-        public DbSet<Token> Token { get; set; }
+        public DbSet<RefreshToken> Token { get; set; }
         public DatabaseContext(DbContextOptions options) : base(options)
         {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Token>(entity =>
+            modelBuilder.Entity<RefreshToken>(entity =>
             {
-                entity.ToTable("Token");
+                entity.ToTable("RefreshToken");
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.AccessToken);
-                entity.Property(e => e.RefreshToken);
+                entity.Property(e => e.Token);
                 entity.Property(e => e.CreatedTime);
                 entity.Property(e => e.ExpiredTime);
                 entity.Property(e => e.Revoked);

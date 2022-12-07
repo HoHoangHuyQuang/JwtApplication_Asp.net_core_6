@@ -26,6 +26,17 @@ namespace JwtApplication.Repository.Implement
                                    .FirstOrDefaultAsync();
             return user;
         }
+        public bool IsExistByUsername(string username)
+        {
+            if (username == null) return false;
+            var user = _dbSet.AsNoTracking().SingleOrDefault(e => e.UserName.Equals(username));
+            if (user != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public AuthResponse Authenticate(LoginRequest request)
         {
             var user = _dbSet.AsNoTracking()
@@ -38,10 +49,16 @@ namespace JwtApplication.Repository.Implement
             string accessToken = JwtUtils.GenerateAccessToken(user);
             string refreshToken = JwtUtils.GenerateRefreshToken();
 
-            _context.Token.Add(new Token()
+            var isUnique = !_context.Token.Any(x => x.Token == refreshToken);
+            while (!isUnique)
             {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken,
+                refreshToken = JwtUtils.GenerateRefreshToken();
+            }
+
+            _context.Token.Add(new RefreshToken()
+            {
+                Token = refreshToken,
+                User = user,
                 CreatedTime = DateTime.Now,
                 ExpiredTime = DateTime.Now.AddDays(7),
                 Revoked = null,
@@ -49,19 +66,9 @@ namespace JwtApplication.Repository.Implement
             _context.SaveChanges();
 
             return new AuthResponse { AccessToken = accessToken, RefreshToken = refreshToken };
-
         }
 
-        public bool IsExistByUsername(string username)
-        {
-            if (username == null) return false;
-            var user = _dbSet.AsNoTracking().SingleOrDefault(e => e.UserName.Equals(username));
-            if (user != null)
-            {
-                return true;
-            }
-            return false;
-        }
+
 
     }
 }

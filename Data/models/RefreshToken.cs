@@ -2,14 +2,15 @@
 
 namespace JwtApplication.Data.models
 {
-    public class Token
+    public class RefreshToken
     {
 
 
         [JsonIgnore]
         public int Id { get; set; }
-        public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }
+        [JsonIgnore]
+        public UserInfo User { get; set; }
+        public string Token { get; set; }
         public DateTime CreatedTime { get; set; }
         public DateTime ExpiredTime { get; set; }
         public DateTime? Revoked { get; set; }

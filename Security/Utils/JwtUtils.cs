@@ -20,6 +20,7 @@ namespace JwtApplication.Security.Utils
 
             var authClaims = new List<Claim>
             {
+                new Claim("Id", user.UserId.ToString()),
                 new Claim("Username", user.UserName)
             };
 

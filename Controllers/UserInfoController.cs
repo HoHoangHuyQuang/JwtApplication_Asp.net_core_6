@@ -1,8 +1,6 @@
 ﻿using JwtApplication.Data.models;
 using JwtApplication.Repository.Interfaces;
-using JwtApplication.Security.payload;
 using JwtApplication.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -206,32 +204,6 @@ namespace JwtApplication.Controllers
         #endregion
 
 
-        [AllowAnonymous]
-        [HttpPost, Route("login")]
-        public async Task<IActionResult> Authenticate([FromBody] LoginRequest request)
-        {
-            if (request == null)
-            {
-                return BadRequest("Invalid request! Username and password not null!");
-            }
-            try
-            {
-                var response = _unitOfWork.UserInfoRepo.Authenticate(request);
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Expires = DateTime.UtcNow.AddDays(7)
-                };
-                Response.Cookies.Append("Bearer", response.RefreshToken, cookieOptions);
-                return Ok(response);
-            }
-            catch (Exception)
-            {
-
-                throw;
-                return BadRequest();
-            }
-        }
 
     }
 }
