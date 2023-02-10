@@ -70,7 +70,6 @@ namespace JwtApplication.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                throw;
                 return NoContent();
             }
         }

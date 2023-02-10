@@ -4,7 +4,6 @@ namespace JwtApplication.Data.models
 {
     public class UserInfo
     {
-
         public int UserId { get; set; }
         public string DisplayName { get; set; }
         public string UserName { get; set; }

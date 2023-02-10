@@ -14,9 +14,12 @@ namespace JwtApplication.Repository.Implement
         {
             _context = context;
         }
+
+
+
         public void RevokeToken(string refreshToken)
         {
-            var token = _dbSet.AsNoTracking().Where(x => x.Token == refreshToken).FirstOrDefault();
+            var token = _dbSet.Where(x => x.Token == refreshToken).FirstOrDefault();
             if (token != null)
             {
                 if (!token.IsActive)
@@ -33,7 +36,9 @@ namespace JwtApplication.Repository.Implement
         public AuthResponse RenewToken(string refreshToken)
         {
 
-            var token = _dbSet.AsNoTracking().Where(x => x.Token == refreshToken).FirstOrDefault();
+            var token = _dbSet
+                        .Include(t => t.User)
+                        .Where(x => x.Token.Equals(refreshToken)).FirstOrDefault();
 
             if (token != null)
             {

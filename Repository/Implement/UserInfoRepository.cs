@@ -19,17 +19,17 @@ namespace JwtApplication.Repository.Implement
 
         public override async Task<UserInfo> FindById(int id)
         {
-            var user = await _dbSet.Include(u => u.UserRoles)
+            var user = await _dbSet
+                                   .Include(u => u.UserRoles)
                                    .ThenInclude(ur => ur.Role)
                                    .Where(u => u.UserId == id)
-                                   .AsNoTracking()
                                    .FirstOrDefaultAsync();
             return user;
         }
         public bool IsExistByUsername(string username)
         {
             if (username == null) return false;
-            var user = _dbSet.AsNoTracking().SingleOrDefault(e => e.UserName.Equals(username));
+            var user = _dbSet.SingleOrDefault(e => e.UserName.Equals(username));
             if (user != null)
             {
                 return true;
@@ -39,8 +39,7 @@ namespace JwtApplication.Repository.Implement
 
         public AuthResponse Authenticate(LoginRequest request)
         {
-            var user = _dbSet.AsNoTracking()
-                             .SingleOrDefault(x => x.UserName.Equals(request.Username));
+            var user = _dbSet.FirstOrDefault(x => x.UserName.Equals(request.Username));
 
             if (user == null || !request.Password.Equals(user.Password))
             {

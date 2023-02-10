@@ -37,10 +37,10 @@ namespace JwtApplication.Security.Utils
 
         public static string GenerateRefreshToken()
         {
-            using (var rngCryptoServiceProvider = new RNGCryptoServiceProvider())
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
             {
                 var randomBytes = new byte[64];
-                rngCryptoServiceProvider.GetBytes(randomBytes);
+                rng.GetBytes(randomBytes);
                 return Convert.ToBase64String(randomBytes);
             }
         }

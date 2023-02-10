@@ -37,7 +37,7 @@ namespace JwtApplication.Controllers
             }
             catch (Exception)
             {
-                throw;
+
                 return BadRequest();
             }
         }
